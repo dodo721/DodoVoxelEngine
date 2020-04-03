@@ -1,0 +1,28 @@
+language: c++
+compiler: gcc
+
+services:
+  - docker
+
+#install:
+#  - cd build
+#  - cmake ..
+#  - make
+
+#before_script:
+#  - mvn clean
+
+jobs:
+  include:
+    - stage: configure
+#      install: skip
+#      jdk: oraclejdk11
+      script:
+        - cd build
+        - cmake ..
+    - stage: build
+      script: make
+
+stages:
+  - configure
+  - build
