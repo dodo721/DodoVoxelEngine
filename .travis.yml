@@ -18,6 +18,7 @@ jobs:
 #      install: skip
 #      jdk: oraclejdk11
       script:
+        - mkdir build
         - cd build
         - cmake ..
     - stage: build
