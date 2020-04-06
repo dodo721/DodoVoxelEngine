@@ -12,5 +12,5 @@ uniform sampler2D tex2d;
 void main(){
 
     // Output color = color of the texture at the specified UV
-    color = rgb(1,0,0);//texture( tex2d, UV ).rgb;
+    color = texture( tex2d, UV ).rgb;
 }

@@ -11,12 +11,15 @@ using namespace obj3D;
 
 Obj::Obj () {}
 
-Obj::Obj (int vertLength, float* verts, float* uv): vertSize(vertLength) {
-    vertices = arrayToVector<float>(verts, vertLength * 3);
-    uvs = arrayToVector<float>(uv, vertLength * 2);
+Obj::Obj (int tris, float* verts, float* uv): vertSize(tris) {
+    vertices = arrayToVector<float>(verts, tris * 3);
+    uvs = arrayToVector<float>(uv, tris * 2);
+    position = vec3(0);
 }
 
-Obj::Obj (vector<float> verts, vector<float> uv): vertices(verts), uvs(uv) {}
+Obj::Obj (vector<float> verts, vector<float> uv): vertices(verts), uvs(uv) {
+    position = vec3(0);
+}
 
 int Obj::getVertSize () {
     return vertices.size();

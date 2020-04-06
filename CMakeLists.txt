@@ -45,7 +45,9 @@ set(LIBS OpenGL::GL glfw glad)
 
 # Compile project source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-add_executable(${PROJECT_NAME} ${SOURCES})
+file(GLOB_RECURSE SHADERS "shaders/*.vert" "shaders/*.frag")
+
+add_executable(${PROJECT_NAME} ${SOURCES} ${SHADERS})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} ${LIBS})
