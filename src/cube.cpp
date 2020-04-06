@@ -2,7 +2,7 @@
 #include "array_utils.hpp"
 
 using namespace glm;
-using namespace obj3D;
+using namespace vox::obj;
 
 // Model verts
 const float cube_vertex_array[] = {
@@ -87,21 +87,14 @@ const float cube_uv_array[] = {
 float* cube_vertex_data = (float*)&cube_vertex_array[0];
 float* cube_uv_data = (float*)&cube_uv_array[0];
 
-Obj* createCube (vec3 position) {
-
-    Obj *obj = new Obj(12 * 3, cube_vertex_data, cube_uv_data);
-    obj->position = position;
-    obj->name = "Cube";
-    obj->texpath = "grass.png";
+VoxObj createCube (vec3 position) {
+    Mesh mesh = Mesh(12 * 3, cube_vertex_data, cube_uv_data);
+    VoxObj obj = VoxObj("Cube", mesh, "grass.png", position);
     return obj;
-
 }
 
-Obj* createCube () {
-
-    Obj *obj = new Obj(12 * 3, cube_vertex_data, cube_uv_data);
-    obj->name = "Cube";
-    obj->texpath = "grass.png";
+VoxObj createCube () {
+    Mesh mesh = Mesh(12 * 3, cube_vertex_data, cube_uv_data);
+    VoxObj obj = VoxObj("Cube", mesh, "grass.png");
     return obj;
-
 }

@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string>
 
-#include <obj.hpp>
+#include <voxobj.hpp>
 #include <cube.hpp>
 #include <macros.hpp>
 #include <shader.hpp>
@@ -26,9 +26,10 @@
 
 using namespace glm;
 using namespace std;
-using namespace obj3D;
+using namespace vox;
+using namespace obj;
 
-void loadObj (Obj& obj);
+void loadVoxObj (VoxObj& obj);
 GLuint loadPNG (string imagepath);
 
 int main( void )
@@ -89,21 +90,17 @@ int main( void )
 								glm::vec3(0,0,0), // and looks at the origin
 								glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 						   );
-
-	// Load the texture using any two methods
-	//GLuint Texture = loadBMP_custom("uvtemplate.bmp");
-	GLuint Texture = loadPNG("grass.png");
 	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "tex2d");
 
-	vector<Obj*> objects (0);
-	Obj* cube = createCube();
+	vector<VoxObj> objects (0);
+	VoxObj cube = createCube();
 	objects.push_back(cube);
 
-	foreach (Obj*, obj, objects)
-		cout << "Loading " << (*obj)->name << endl;
-		loadObj(**obj);
+	foreach (VoxObj, obj, objects)
+		cout << "Loading " << obj->name << endl;
+		loadVoxObj(*obj);
 	}
 
 	do{
@@ -114,13 +111,14 @@ int main( void )
 		// Use our shader
 		glUseProgram(programID);
 
-		// Bind our texture in Texture Unit 0
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture);
-		// Set our "myTextureSampler" sampler to use Texture Unit 0
-		glUniform1i(TextureID, 0);
+		foreach(VoxObj, obj, objects)
 
-		npforeach(Obj*, obj, objects)
+			// Bind our texture in Texture Unit 0
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, obj->mesh.texid);
+			// Set our "myTextureSampler" sampler to use Texture Unit 0
+			glUniform1i(TextureID, 0);
+
 			//cout << obj->position.x << ", " << obj->position.y << ", " << obj->position.z << endl;
 			// Model matrix : an identity matrix (model will be at the origin)
 			glm::mat4 Model = glm::translate(glm::mat4(1.0f), obj->position);
@@ -129,11 +127,11 @@ int main( void )
 			// Send our transformation to the currently bound shader, 
 			// in the "MVP" uniform
 			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-			glBindVertexArray(obj->VAO);
+			glBindVertexArray(obj->mesh.VAO);
 
 			// 1rst attribute buffer : vertices
 			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, obj->vertexBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, obj->mesh.vertexBuffer);
 			glVertexAttribPointer(
 				0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
 				3,                  // size
@@ -145,7 +143,7 @@ int main( void )
 
 			// 2nd attribute buffer : UVs
 			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, obj->uvBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, obj->mesh.uvBuffer);
 			glVertexAttribPointer(
 				1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
 				2,                                // size : U+V => 2
@@ -156,7 +154,7 @@ int main( void )
 			);
 
 			// Draw the triangle !
-			glDrawArrays(GL_TRIANGLES, 0, obj->getVertSize()); // 12*3 indices starting at 0 -> 12 triangles
+			glDrawArrays(GL_TRIANGLES, 0, obj->mesh.getVertSize()); // 12*3 indices starting at 0 -> 12 triangles
 
 			glDisableVertexAttribArray(0);
 			glDisableVertexAttribArray(1);
@@ -171,15 +169,15 @@ int main( void )
 		   glfwWindowShouldClose(window) == 0 );
 
 	// Cleanup VBO and shader
-	npforeach (Obj*, obj, objects)
-		glDeleteBuffers(1, &obj->vertexBuffer);
-		glDeleteBuffers(1, &obj->uvBuffer);
-		glDeleteVertexArrays(1, &obj->VAO);
+	foreach (VoxObj, obj, objects)
+		glDeleteBuffers(1, &obj->mesh.vertexBuffer);
+		glDeleteBuffers(1, &obj->mesh.uvBuffer);
+		glDeleteVertexArrays(1, &obj->mesh.VAO);
+		glDeleteTextures(1, &obj->mesh.texid);
 		delete obj;
 	}
 
 	glDeleteProgram(programID);
-	glDeleteTextures(1, &Texture);
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
@@ -187,18 +185,18 @@ int main( void )
 	return 0;
 }
 
-void loadObj (Obj& obj) {
+void loadVoxObj (VoxObj& obj) {
 
-	glGenVertexArrays(1, &obj.VAO);
-	glBindVertexArray(obj.VAO);
+	glGenVertexArrays(1, &obj.mesh.VAO);
+	glBindVertexArray(obj.mesh.VAO);
 
-	glGenBuffers(1, &obj.vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, obj.vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, obj.getVertSize() * sizeof(obj.getVerts()[0]), obj.getVerts(), GL_STATIC_DRAW);
+	glGenBuffers(1, &obj.mesh.vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, obj.mesh.vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, obj.mesh.getVertSize() * sizeof(obj.mesh.getVerts()[0]), obj.mesh.getVerts(), GL_STATIC_DRAW);
 
-	glGenBuffers(1, &obj.uvBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, obj.uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, obj.getUVSize() * sizeof(obj.getUVs()[0]), obj.getUVs(), GL_STATIC_DRAW);
+	glGenBuffers(1, &obj.mesh.uvBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, obj.mesh.uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, obj.mesh.getUVSize() * sizeof(obj.mesh.getUVs()[0]), obj.mesh.getUVs(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 	//std::vector<unsigned int> indices;
@@ -211,7 +209,7 @@ void loadObj (Obj& obj) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getIndicesSize() * sizeof(unsigned int), obj.getIndices(), GL_STATIC_DRAW);*/
 
 	try {
-		obj.texid = loadPNG(obj.texpath);
+		obj.mesh.texid = loadPNG(obj.texpath);
 	} catch (const char* e) {
 		cout << "Error: " << e << endl;
 		throw;
