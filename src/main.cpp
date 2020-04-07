@@ -7,6 +7,7 @@
 #include <cube.hpp>
 #include <macros.hpp>
 #include <shader.hpp>
+#include <texture.hpp>
 
 //#include <GL/glew.h>
 #include <glad/glad.h>
@@ -15,12 +16,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
-
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 #include <vector>
 
@@ -31,6 +28,9 @@ using namespace obj;
 
 void loadVoxObj (VoxObj& obj);
 GLuint loadPNG (string imagepath);
+
+vector<Texture> textures (0);
+vector<VoxObj> objects (0);
 
 int main( void )
 {
@@ -94,9 +94,10 @@ int main( void )
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "tex2d");
 
-	vector<VoxObj> objects (0);
 	VoxObj cube = createCube();
 	objects.push_back(cube);
+	VoxObj cube2 = createCube(vec3(2,0,0));
+	objects.push_back(cube2);
 
 	foreach (VoxObj, obj, objects)
 		cout << "Loading " << obj->name << endl;
@@ -115,7 +116,7 @@ int main( void )
 
 			// Bind our texture in Texture Unit 0
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, obj->mesh.texid);
+			glBindTexture(GL_TEXTURE_2D, obj->texture->textureId);
 			// Set our "myTextureSampler" sampler to use Texture Unit 0
 			glUniform1i(TextureID, 0);
 
@@ -173,8 +174,7 @@ int main( void )
 		glDeleteBuffers(1, &obj->mesh.vertexBuffer);
 		glDeleteBuffers(1, &obj->mesh.uvBuffer);
 		glDeleteVertexArrays(1, &obj->mesh.VAO);
-		glDeleteTextures(1, &obj->mesh.texid);
-		delete obj;
+		glDeleteTextures(1, &obj->texture->textureId);
 	}
 
 	glDeleteProgram(programID);
@@ -208,45 +208,14 @@ void loadVoxObj (VoxObj& obj) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.indiceBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getIndicesSize() * sizeof(unsigned int), obj.getIndices(), GL_STATIC_DRAW);*/
 
-	try {
-		obj.mesh.texid = loadPNG(obj.texpath);
-	} catch (const char* e) {
-		cout << "Error: " << e << endl;
-		throw;
+	foreach(Texture, tex, textures)
+		if (tex->filePath == obj.texpath) {
+			obj.texture = tex;
+			return;
+		}
 	}
-}
 
-GLuint loadPNG(string imagename){
-
-	string texDir = "res/textures/";
-	string imagepath = texDir + imagename;
-
-    int w;
-	int h;
-	int comp;
-	unsigned char* image = stbi_load(imagepath.c_str(), &w, &h, &comp, STBI_rgb);
-
-	if(image == nullptr)
-		throw("Failed to load texture");
-	
-	// Create one OpenGL texture
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-
-	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	// Give the image to OpenGL
-	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, image);
-
-	// Nice trilinear filtering.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);*/
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    return textureID;
+	Texture texture (obj.texpath);
+	textures.push_back(texture);
+	obj.texture = &texture;
 }

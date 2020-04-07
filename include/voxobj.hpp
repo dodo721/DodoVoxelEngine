@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "mesh.hpp"
+#include "texture.hpp"
 
 namespace vox {
     namespace obj {
@@ -15,6 +16,7 @@ namespace vox {
                 Mesh mesh;
                 std::string name;
                 std::string texpath;
+                Texture *texture;
                 glm::vec3 position = glm::vec3(0);
                 VoxObj();
                 VoxObj(std::string name, Mesh mesh, std::string texpath);
