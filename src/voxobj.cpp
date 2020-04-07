@@ -1,7 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 #include "voxobj.hpp"
+#include "glm/glm.hpp"
+#include "mesh.hpp"
+#include "texture.hpp"
 #include "macros.hpp"
 #include "array_utils.hpp"
 
@@ -11,5 +15,10 @@ using namespace vox::obj;
 
 VoxObj::VoxObj () {}
 
-VoxObj::VoxObj (string name, Mesh mesh, string texpath): name(name), mesh(mesh), texpath(texpath) {}
-VoxObj::VoxObj (string name, Mesh mesh, string texpath, vec3 position): name(name), mesh(mesh), texpath(texpath), position(position) {}
+VoxObj::VoxObj (string name, Mesh* mesh, string texpath): name(name), mesh(mesh), texpath(texpath) {}
+VoxObj::VoxObj (string name, Mesh* mesh, string texpath, vec3 position): name(name), mesh(mesh), texpath(texpath), position(position) {}
+
+VoxObj::~VoxObj () {
+    delete mesh;
+    delete texture;
+}

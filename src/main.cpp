@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string>
 
+#include <mesh.hpp>
 #include <voxobj.hpp>
 #include <cube.hpp>
 #include <macros.hpp>
@@ -29,8 +30,8 @@ using namespace obj;
 void loadVoxObj (VoxObj& obj);
 GLuint loadPNG (string imagepath);
 
-vector<Texture> textures (0);
-vector<VoxObj> objects (0);
+vector<Texture*> textures (0);
+vector<VoxObj*> objects (0);
 
 int main( void )
 {
@@ -94,12 +95,12 @@ int main( void )
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "tex2d");
 
-	VoxObj cube = createCube();
+	VoxObj* cube = createCube();
 	objects.push_back(cube);
-	VoxObj cube2 = createCube(vec3(2,0,0));
+	VoxObj* cube2 = createCube(vec3(2,0,0));
 	objects.push_back(cube2);
 
-	foreach (VoxObj, obj, objects)
+	npforeach (VoxObj*, obj, objects)
 		cout << "Loading " << obj->name << endl;
 		loadVoxObj(*obj);
 	}
@@ -112,7 +113,7 @@ int main( void )
 		// Use our shader
 		glUseProgram(programID);
 
-		foreach(VoxObj, obj, objects)
+		npforeach(VoxObj*, obj, objects)
 
 			// Bind our texture in Texture Unit 0
 			glActiveTexture(GL_TEXTURE0);
@@ -128,11 +129,11 @@ int main( void )
 			// Send our transformation to the currently bound shader, 
 			// in the "MVP" uniform
 			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-			glBindVertexArray(obj->mesh.VAO);
+			glBindVertexArray(obj->mesh->VAO);
 
 			// 1rst attribute buffer : vertices
 			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, obj->mesh.vertexBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, obj->mesh->vertexBuffer);
 			glVertexAttribPointer(
 				0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
 				3,                  // size
@@ -144,7 +145,7 @@ int main( void )
 
 			// 2nd attribute buffer : UVs
 			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, obj->mesh.uvBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, obj->mesh->uvBuffer);
 			glVertexAttribPointer(
 				1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
 				2,                                // size : U+V => 2
@@ -155,7 +156,7 @@ int main( void )
 			);
 
 			// Draw the triangle !
-			glDrawArrays(GL_TRIANGLES, 0, obj->mesh.getVertSize()); // 12*3 indices starting at 0 -> 12 triangles
+			glDrawArrays(GL_TRIANGLES, 0, obj->mesh->getVertSize()); // 12*3 indices starting at 0 -> 12 triangles
 
 			glDisableVertexAttribArray(0);
 			glDisableVertexAttribArray(1);
@@ -170,11 +171,12 @@ int main( void )
 		   glfwWindowShouldClose(window) == 0 );
 
 	// Cleanup VBO and shader
-	foreach (VoxObj, obj, objects)
-		glDeleteBuffers(1, &obj->mesh.vertexBuffer);
-		glDeleteBuffers(1, &obj->mesh.uvBuffer);
-		glDeleteVertexArrays(1, &obj->mesh.VAO);
+	npforeach (VoxObj*, obj, objects)
+		glDeleteBuffers(1, &obj->mesh->vertexBuffer);
+		glDeleteBuffers(1, &obj->mesh->uvBuffer);
+		glDeleteVertexArrays(1, &obj->mesh->VAO);
 		glDeleteTextures(1, &obj->texture->textureId);
+		delete obj;
 	}
 
 	glDeleteProgram(programID);
@@ -187,16 +189,16 @@ int main( void )
 
 void loadVoxObj (VoxObj& obj) {
 
-	glGenVertexArrays(1, &obj.mesh.VAO);
-	glBindVertexArray(obj.mesh.VAO);
+	glGenVertexArrays(1, &obj.mesh->VAO);
+	glBindVertexArray(obj.mesh->VAO);
 
-	glGenBuffers(1, &obj.mesh.vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, obj.mesh.vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, obj.mesh.getVertSize() * sizeof(obj.mesh.getVerts()[0]), obj.mesh.getVerts(), GL_STATIC_DRAW);
+	glGenBuffers(1, &obj.mesh->vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, obj.mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, obj.mesh->getVertSize() * sizeof(obj.mesh->getVerts()[0]), obj.mesh->getVerts(), GL_STATIC_DRAW);
 
-	glGenBuffers(1, &obj.mesh.uvBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, obj.mesh.uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, obj.mesh.getUVSize() * sizeof(obj.mesh.getUVs()[0]), obj.mesh.getUVs(), GL_STATIC_DRAW);
+	glGenBuffers(1, &obj.mesh->uvBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, obj.mesh->uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, obj.mesh->getUVSize() * sizeof(obj.mesh->getUVs()[0]), obj.mesh->getUVs(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 	//std::vector<unsigned int> indices;
@@ -208,14 +210,14 @@ void loadVoxObj (VoxObj& obj) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.indiceBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getIndicesSize() * sizeof(unsigned int), obj.getIndices(), GL_STATIC_DRAW);*/
 
-	foreach(Texture, tex, textures)
+	npforeach(Texture*, tex, textures)
 		if (tex->filePath == obj.texpath) {
 			obj.texture = tex;
 			return;
 		}
 	}
 
-	Texture texture (obj.texpath);
+	Texture* texture  = new Texture(obj.texpath);
 	textures.push_back(texture);
-	obj.texture = &texture;
+	obj.texture = texture;
 }

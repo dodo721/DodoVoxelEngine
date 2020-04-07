@@ -1,5 +1,7 @@
 #include "cube.hpp"
 #include "array_utils.hpp"
+#include "mesh.hpp"
+#include "voxobj.hpp"
 
 using namespace glm;
 using namespace vox::obj;
@@ -87,14 +89,14 @@ const float cube_uv_array[] = {
 float* cube_vertex_data = (float*)&cube_vertex_array[0];
 float* cube_uv_data = (float*)&cube_uv_array[0];
 
-VoxObj createCube (vec3 position) {
-    Mesh mesh = Mesh(12 * 3, cube_vertex_data, cube_uv_data);
-    VoxObj obj = VoxObj("Cube", mesh, "grass.png", position);
+VoxObj* createCube (vec3 position) {
+    Mesh* mesh = new Mesh(12 * 3, cube_vertex_data, cube_uv_data);
+    VoxObj* obj = new VoxObj("Cube", mesh, "grass.png", position);
     return obj;
 }
 
-VoxObj createCube () {
-    Mesh mesh = Mesh(12 * 3, cube_vertex_data, cube_uv_data);
-    VoxObj obj = VoxObj("Cube", mesh, "grass.png");
+VoxObj* createCube () {
+    Mesh* mesh = new Mesh(12 * 3, cube_vertex_data, cube_uv_data);
+    VoxObj* obj = new VoxObj("Cube", mesh, "grass.png");
     return obj;
 }

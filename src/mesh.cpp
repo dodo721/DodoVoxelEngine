@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "mesh.hpp"
 #include "macros.hpp"
 #include "array_utils.hpp"
