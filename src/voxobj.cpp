@@ -19,6 +19,11 @@ VoxObj::VoxObj (string name, Mesh* mesh, string texpath): name(name), mesh(mesh)
 VoxObj::VoxObj (string name, Mesh* mesh, string texpath, vec3 position): name(name), mesh(mesh), texpath(texpath), position(position) {}
 
 VoxObj::~VoxObj () {
-    delete mesh;
-    delete texture;
+    mesh->objRefs--;
+    if (mesh->objRefs == 0)
+        delete mesh;
+        
+    texture->objRefs--;
+    if (texture->objRefs == 0)
+        delete texture;
 }

@@ -88,15 +88,14 @@ const float cube_uv_array[] = {
 
 float* cube_vertex_data = (float*)&cube_vertex_array[0];
 float* cube_uv_data = (float*)&cube_uv_array[0];
+Mesh* cubeMesh = new Mesh(12 * 3, cube_vertex_data, cube_uv_data);
 
 VoxObj* createCube (vec3 position) {
-    Mesh* mesh = new Mesh(12 * 3, cube_vertex_data, cube_uv_data);
-    VoxObj* obj = new VoxObj("Cube", mesh, "grass.png", position);
+    VoxObj* obj = new VoxObj("Cube", cubeMesh, "grass.png", position);
     return obj;
 }
 
 VoxObj* createCube () {
-    Mesh* mesh = new Mesh(12 * 3, cube_vertex_data, cube_uv_data);
-    VoxObj* obj = new VoxObj("Cube", mesh, "grass.png");
+    VoxObj* obj = new VoxObj("Cube", cubeMesh, "grass.png");
     return obj;
 }

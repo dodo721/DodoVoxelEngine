@@ -21,6 +21,7 @@ namespace vox {
                 unsigned int indiceBuffer;
                 unsigned int vertSize;
                 unsigned int uvSize;
+                unsigned int objRefs = 0;
                 Mesh();
                 Mesh(int tris, float* verts, float* uv);
                 Mesh(vector<float> verts, vector<float> uv);

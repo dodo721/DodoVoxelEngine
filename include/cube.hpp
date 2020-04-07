@@ -9,8 +9,6 @@ namespace vox {
     }
 }
 
-extern float* cube_vertex_data;
-extern float* cube_colour_data;
 vox::obj::VoxObj* createCube (glm::vec3 position);
 vox::obj::VoxObj* createCube ();
 

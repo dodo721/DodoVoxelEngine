@@ -9,6 +9,7 @@ namespace vox {
         class Texture {
             public:
                 unsigned int textureId;
+                unsigned int objRefs = 0;
                 std::string filePath;
                 Texture(std::string filePath);
                 Texture();
