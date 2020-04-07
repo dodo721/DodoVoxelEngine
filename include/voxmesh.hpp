@@ -3,11 +3,15 @@
 
 namespace vox::obj {
 
+    class Mesh;
+
     class VoxMesh {
         bool*** data;
         int width = 0;
         int height = 0;
         int length = 0;
+        Mesh mesh;
+        void calcMesh ();
         public:
             bool extendable = false;
             VoxMesh();

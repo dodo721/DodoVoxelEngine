@@ -18,6 +18,10 @@ VoxMesh::~VoxMesh () {
     delete[] data;
 }
 
+void VoxMesh::calcMesh () {
+    
+}
+
 bool VoxMesh::appendUnit (int x, int y, int z) {
 
     if (x < width && y < height && z < length) {
@@ -25,7 +29,7 @@ bool VoxMesh::appendUnit (int x, int y, int z) {
         if (data[x][y][z]) // Unit already exists, fail
             return false;
         
-        
+        data[x][y][z] = true;
 
     } else if (extendable) { // Unit is out of bounds, but bounds can be extended
 
