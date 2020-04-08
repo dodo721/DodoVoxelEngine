@@ -23,8 +23,7 @@ namespace vox {
                 unsigned int uvSize;
                 unsigned int objRefs = 0;
                 Mesh();
-                Mesh(int tris, float* verts, float* uv);
-                Mesh(vector<float> verts, vector<float> uv);
+                Mesh(vector<float> verts, vector<float> uv, vector<unsigned int> indices);
                 int getVertSize();
                 int getUVSize();
                 int getIndicesSize();

@@ -175,8 +175,18 @@ namespace vox::render {
                 (void*)0                          // array buffer offset
             );
 
-            // Draw the triangle !
-            glDrawArrays(GL_TRIANGLES, 0, obj->mesh->getVertSize()); // 12*3 indices starting at 0 -> 12 triangles
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->mesh->indiceBuffer);
+
+            // Draw the triangles !
+            glDrawElements(
+                GL_TRIANGLES,      // mode
+                obj->mesh->getIndicesSize(),    // count
+                GL_UNSIGNED_INT,   // type
+                (void*)0           // element array buffer offset
+            );
+
+            /*// Draw the triangle !
+            glDrawArrays(GL_TRIANGLES, 0, obj->mesh->getVertSize()); // 12*3 indices starting at 0 -> 12 triangles*/
 
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);
@@ -206,9 +216,9 @@ namespace vox::render {
         // fill "indices" as needed
 
         // Generate a buffer for the indices
-        /*glGenBuffers(1, &obj.indiceBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.indiceBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.getIndicesSize() * sizeof(unsigned int), obj.getIndices(), GL_STATIC_DRAW);*/
+        glGenBuffers(1, &obj.mesh->indiceBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.mesh->indiceBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, obj.mesh->getIndicesSize() * sizeof(unsigned int), obj.mesh->getIndices(), GL_STATIC_DRAW);
 
         npforeach(Texture*, tex, textures)
             if (tex->filePath == obj.texpath) {

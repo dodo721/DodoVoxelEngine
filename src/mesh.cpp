@@ -8,12 +8,7 @@ using namespace vox::obj;
 
 Mesh::Mesh () {}
 
-Mesh::Mesh (int tris, float* verts, float* uv): vertSize(tris) {
-    vertices = arrayToVector<float>(verts, tris * 3);
-    uvs = arrayToVector<float>(uv, tris * 2);
-}
-
-Mesh::Mesh (vector<float> verts, vector<float> uv): vertices(verts), uvs(uv) {}
+Mesh::Mesh (vector<float> verts, vector<float> uv, vector<unsigned int> indices): vertices(verts), uvs(uv), indices(indices) {}
 
 int Mesh::getVertSize () {
     return vertices.size();

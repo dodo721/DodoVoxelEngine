@@ -6,89 +6,29 @@
 using namespace glm;
 using namespace vox::obj;
 
-// Model verts
-const float cube_vertex_array[] = {
-    -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-    -1.0f,-1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f, // triangle 1 : end
-    1.0f, 1.0f,-1.0f, // triangle 2 : begin
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f, // triangle 2 : end
-    1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f,-1.0f,
-    1.0f,-1.0f,-1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f,
-    1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-    1.0f,-1.0f, 1.0f
+float cube_vertex_array[] = {
+    -1.0f, -1.0f, -1.0f,            // 0 - bottom left
+    -1.0f, 1.0f, -1.0f,             // 1 - top left
+    1.0f, 1.0f, -1.0f,              // 2 - top right
+    1.0f, -1.0f, -1.0f              // 3 - bottom right
 };
 
-// Two UV coordinates for each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
-const float cube_uv_array[] = {
-    0.000059f, 1.0f-0.000004f,
-    0.000103f, 1.0f-0.336048f,
-    0.335973f, 1.0f-0.335903f,
-    1.000023f, 1.0f-0.000013f,
-    0.667979f, 1.0f-0.335851f,
-    0.999958f, 1.0f-0.336064f,
-    0.667979f, 1.0f-0.335851f,
-    0.336024f, 1.0f-0.671877f,
-    0.667969f, 1.0f-0.671889f,
-    1.000023f, 1.0f-0.000013f,
-    0.668104f, 1.0f-0.000013f,
-    0.667979f, 1.0f-0.335851f,
-    0.000059f, 1.0f-0.000004f,
-    0.335973f, 1.0f-0.335903f,
-    0.336098f, 1.0f-0.000071f,
-    0.667979f, 1.0f-0.335851f,
-    0.335973f, 1.0f-0.335903f,
-    0.336024f, 1.0f-0.671877f,
-    1.000004f, 1.0f-0.671847f,
-    0.999958f, 1.0f-0.336064f,
-    0.667979f, 1.0f-0.335851f,
-    0.668104f, 1.0f-0.000013f,
-    0.335973f, 1.0f-0.335903f,
-    0.667979f, 1.0f-0.335851f,
-    0.335973f, 1.0f-0.335903f,
-    0.668104f, 1.0f-0.000013f,
-    0.336098f, 1.0f-0.000071f,
-    0.000103f, 1.0f-0.336048f,
-    0.000004f, 1.0f-0.671870f,
-    0.336024f, 1.0f-0.671877f,
-    0.000103f, 1.0f-0.336048f,
-    0.336024f, 1.0f-0.671877f,
-    0.335973f, 1.0f-0.335903f,
-    0.667969f, 1.0f-0.671889f,
-    1.000004f, 1.0f-0.671847f,
-    0.667979f, 1.0f-0.335851f
+float cube_uv_array[] = {
+    -1.0f, -1.0f,
+    -1.0f, 1.0f,
+    1.0f, 1.0f,
+    1.0f, -1.0f
 };
 
-float* cube_vertex_data = (float*)&cube_vertex_array[0];
-float* cube_uv_data = (float*)&cube_uv_array[0];
-Mesh* cubeMesh = new Mesh(12 * 3, cube_vertex_data, cube_uv_data);
+unsigned int cube_indices_array[] = {
+    3, 0, 1,
+    1, 2, 3
+};
+
+vector<float> cube_vertex_data = arrayToVector<float>(cube_vertex_array, sizeof(cube_vertex_array) / sizeof(cube_vertex_array[0]));
+vector<float> cube_uv_data = arrayToVector<float>(cube_uv_array, sizeof(cube_uv_array) / sizeof(cube_uv_array[0]));
+vector<unsigned int> cube_indices_data = arrayToVector<unsigned int>(cube_indices_array, sizeof(cube_indices_array) / sizeof(cube_indices_array[0]));
+Mesh* cubeMesh = new Mesh(cube_vertex_data, cube_uv_data, cube_indices_data);
 
 VoxObj* createCube (vec3 position) {
     VoxObj* obj = new VoxObj("Cube", cubeMesh, "grass.png", position);
