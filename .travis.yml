@@ -4,10 +4,8 @@ compiler: gcc
 services:
   - docker
 
-#install:
-#  - cd build
-#  - cmake ..
-#  - make
+install:
+  - sudo apt-get install -qq --force-yes mesa-utils libgl1-mesa-swx11 libgl1-mesa-swx11-dev xvfb  
 
 #before_script:
 #  - mvn clean

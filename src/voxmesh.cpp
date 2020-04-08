@@ -1,12 +1,12 @@
 #include "voxmesh.hpp"
 
-#include "mesh.hpp"
-
 using namespace vox::obj;
 
 VoxMesh::VoxMesh () {}
 
-VoxMesh::VoxMesh (bool*** data, int width, int height, int length): data(data), width(width), height(height), length(length) {}
+VoxMesh::VoxMesh (bool*** data, int width, int height, int length): data(data), width(width), height(height), length(length) {
+    calcMesh();
+}
 
 VoxMesh::~VoxMesh () {
     for (int i  = 0; i < width; i++) {
@@ -20,6 +20,8 @@ VoxMesh::~VoxMesh () {
 
 void VoxMesh::calcMesh () {
     
+    
+
 }
 
 bool VoxMesh::appendUnit (int x, int y, int z) {
