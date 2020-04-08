@@ -12,15 +12,12 @@ install:
 
 jobs:
   include:
-    - stage: configure
-#      install: skip
-#      jdk: oraclejdk11
+    - stage: build
       script:
         - mkdir build
         - cd build
         - cmake ..
-    - stage: build
-      script: make
+        - make
 
 stages:
   - configure
