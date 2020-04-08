@@ -19,7 +19,7 @@ jobs:
         - mkdir build
         - cd build
         - cmake ..
-        - make -std=c++11
+        - make
 
 stages:
   - configure
